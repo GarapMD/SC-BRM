@@ -1,0 +1,128 @@
+-- Universal GUI Hub (Rayfield) -- Full upgraded version
+-- Only paste into Solara or executor; client-side only
+
+-- Load Rayfield safely
+local ok, Rayfield = pcall(function()
+    return loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+end)
+if not ok or not Rayfield then
+    warn("Rayfield failed to load. Check your executor/network.")
+    return
+end
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+
+-- State table
+local g = {
+    WalkSpeed = 16,
+    JumpPower = 50,
+    Fly = false,
+    FlySpeed = 70,
+    Noclip = false,
+    InfJump = false,
+    ESP = false,
+}
+
+-- Utility
+local function safeHumanoidSet(prop,val)
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then hum[prop] = val end
+        end
+    end)
+end
+
+-- Window
+local Window = Rayfield:CreateWindow({
+    Name = "🎮 SC HUB BREMBO GAMING 🎮",
+    LoadingTitle = "SCRIFT BY YT CHANNEL BREMBO GAMING",
+    LoadingSubtitle = "❗ ini adalah sc buatan brembo gaming dilarang di salah gunakan  ❗",
+    ConfigurationSaving = { Enabled = false },
+    KeySystem = false
+})
+
+-- ================= Movement Tab =================
+local MovementTab = Window:CreateTab("MOVEMENT")
+
+-- WalkSpeed Slider
+MovementTab:CreateSlider({
+    Name = "WalkSpeed",
+    Range = {16, 300},
+    Increment = 1,
+    Suffix = "WS",
+    CurrentValue = g.WalkSpeed,
+    Callback = function(val)
+        g.WalkSpeed = val
+        safeHumanoidSet("WalkSpeed", val)
+    end
+})
+
+-- JumpPower Slider
+MovementTab:CreateSlider({
+    Name = "JumpPower",
+    Range = {50, 300},
+    Increment = 1,
+    Suffix = "JP",
+    CurrentValue = g.JumpPower,
+    Callback = function(val)
+        g.JumpPower = val
+        safeHumanoidSet("JumpPower", val)
+    end
+})
+
+-- NoClip Toggle
+local noclipConnection
+MovementTab:CreateToggle({
+    Name = "NoClip",
+    CurrentValue = g.Noclip,
+    Callback = function(state)
+        g.Noclip = state
+        if state then
+            noclipConnection = RunService.Stepped:Connect(function()
+                local char = LocalPlayer.Character
+                if char then
+                    for _,v in ipairs(char:GetDescendants()) do
+                        if v:IsA("BasePart") then
+                            pcall(function() v.CanCollide = false end)
+                        end
+                    end
+                end
+            end)
+        else
+            if noclipConnection and noclipConnection.Connected then noclipConnection:Disconnect() end
+            -- restore CanCollide
+            local char = LocalPlayer.Character
+            if char then
+                for _,v in ipairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+})
+
+-- Infinite Jump
+MovementTab:CreateToggle({
+    Name = "Infinite Jump",
+    CurrentValue = g.InfJump,
+    Callback = function(state)
+        g.InfJump = state
+    end
+})
+UserInputService.JumpRequest:Connect(function()
+    if g.InfJump then
+        local hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+    end
+end)
+
+-- Notify load
+Rayfield:Notify({Title="Universal GUI", Content="Loaded successfully", Duration=3})
