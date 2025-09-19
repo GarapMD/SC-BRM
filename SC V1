@@ -42,7 +42,7 @@ end
 local Window = Rayfield:CreateWindow({
     Name = "🎮 SC HUB BREMBO GAMING 🎮",
     LoadingTitle = "SCRIFT BY YT CHANNEL BREMBO GAMING",
-    LoadingSubtitle = "❗ ini adalah sc buatan brembo gaming dilarang di salah gunakan  ❗",
+    LoadingSubtitle = "ini adalah sc buatan brembo gaming dilarang di salah gunakan",
     ConfigurationSaving = { Enabled = false },
     KeySystem = false
 })
